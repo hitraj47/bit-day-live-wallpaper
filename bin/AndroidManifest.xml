@@ -4,7 +4,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="7"
         android:targetSdkVersion="19" />
     <uses-feature android:required="true" android:name="android.software.live_wallpaper"/>
 
