@@ -1,5 +1,7 @@
 package com.bewareofraj.wallpaper.bitdaylivewallpaper;
 
+import java.util.Calendar;
+
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -28,10 +30,10 @@ public class LiveWallpaperService extends WallpaperService {
 			}
 		};
 		private boolean visible = true;
-		public Bitmap backgroundImage;
 		
 		// Wallpaper images
 		public Bitmap afternoonImage,
+						earlyMorningImage,
 						eveningImage,
 						lateAfternoonImage,
 						lateEveningImage,
@@ -41,8 +43,16 @@ public class LiveWallpaperService extends WallpaperService {
 						nightImage;
 
 		public MyWallpaperEngine() {
-			backgroundImage = BitmapFactory.decodeResource(getResources(),
-					R.drawable.morning);
+			// assign the resources for each image
+			afternoonImage = BitmapFactory.decodeResource(getResources(), R.drawable.afternoon);
+			earlyMorningImage = BitmapFactory.decodeResource(getResources(), R.drawable.early_morning);
+			eveningImage = BitmapFactory.decodeResource(getResources(), R.drawable.evening);
+			lateAfternoonImage = BitmapFactory.decodeResource(getResources(), R.drawable.late_afternoon);
+			lateEveningImage = BitmapFactory.decodeResource(getResources(), R.drawable.late_evening);
+			lateMorningImage = BitmapFactory.decodeResource(getResources(), R.drawable.late_morning);
+			lateNightImage = BitmapFactory.decodeResource(getResources(), R.drawable.late_night);
+			morningImage = BitmapFactory.decodeResource(getResources(), R.drawable.morning);
+			nightImage = BitmapFactory.decodeResource(getResources(), R.drawable.night);
 		}
 
 		public void onCreate(SurfaceHolder surfaceHolder) {
@@ -85,10 +95,10 @@ public class LiveWallpaperService extends WallpaperService {
 					// Bitmap resized =
 					// Bitmap.createScaledBitmap(backgroundImage,
 					// backgroundImage.getWidth(), c.getHeight(), true);
-					Bitmap resized = createScaledImageFillHeight(backgroundImage, c.getWidth(), c.getHeight());
+					Bitmap background = createScaledImageFillHeight(getImageBasedOnHour(), c.getWidth(), c.getHeight());
 					// draw the background image
 					int x = 0;
-					c.drawBitmap(resized, x, 0, null);
+					c.drawBitmap(background, x, 0, null);
 
 					// get width of canvas
 					// int width = c.getWidth();
@@ -103,6 +113,31 @@ public class LiveWallpaperService extends WallpaperService {
 			if (visible) {
 				handler.postDelayed(drawRunner, 10); // delay 10 milliseconds
 			}
+		}
+
+		private Bitmap getImageBasedOnHour() {
+			int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+			
+			if (hour >= 4 && hour < 7) {
+				return earlyMorningImage;
+			} else if (hour >= 7 && hour < 10) {
+				return morningImage;
+			} else if (hour >= 10 && hour < 12) {
+				return lateMorningImage;
+			} else if (hour >= 12 && hour < 16) {
+				return afternoonImage;
+			} else if (hour >= 16 && hour < 18) {
+				return lateAfternoonImage;
+			} else if (hour >= 18 && hour < 20) {
+				return eveningImage;
+			} else if (hour >= 20 && hour < 21) {
+				return lateEveningImage;
+			} else if (hour >= 21 && hour < 23) {
+				return nightImage;
+			} else {
+				return lateNightImage;
+			}
+			
 		}
 
 		private Bitmap createScaledImageFillWidth(Bitmap originalImage, int width, int height) {
