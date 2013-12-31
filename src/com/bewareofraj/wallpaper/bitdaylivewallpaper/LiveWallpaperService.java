@@ -92,9 +92,7 @@ public class LiveWallpaperService extends WallpaperService {
 				// clear the canvas
 				c.drawColor(Color.BLACK);
 				if (c != null) {
-					// Bitmap resized =
-					// Bitmap.createScaledBitmap(backgroundImage,
-					// backgroundImage.getWidth(), c.getHeight(), true);
+					// get a scaled image that fills the height of the device
 					Bitmap background = createScaledImageFillHeight(getImageBasedOnHour(), c.getWidth(), c.getHeight());
 					// draw the background image
 					int x = 0;
