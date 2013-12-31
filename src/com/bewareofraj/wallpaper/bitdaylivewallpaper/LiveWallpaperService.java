@@ -30,29 +30,32 @@ public class LiveWallpaperService extends WallpaperService {
 			}
 		};
 		private boolean visible = true;
-		
+
 		// Wallpaper images
-		public Bitmap afternoonImage,
-						earlyMorningImage,
-						eveningImage,
-						lateAfternoonImage,
-						lateEveningImage,
-						lateMorningImage,
-						lateNightImage,
-						morningImage,
-						nightImage;
+		public Bitmap afternoonImage, earlyMorningImage, eveningImage,
+				lateAfternoonImage, lateEveningImage, lateMorningImage,
+				lateNightImage, morningImage, nightImage;
 
 		public MyWallpaperEngine() {
 			// assign the resources for each image
-			afternoonImage = BitmapFactory.decodeResource(getResources(), R.drawable.afternoon);
-			earlyMorningImage = BitmapFactory.decodeResource(getResources(), R.drawable.early_morning);
-			eveningImage = BitmapFactory.decodeResource(getResources(), R.drawable.evening);
-			lateAfternoonImage = BitmapFactory.decodeResource(getResources(), R.drawable.late_afternoon);
-			lateEveningImage = BitmapFactory.decodeResource(getResources(), R.drawable.late_evening);
-			lateMorningImage = BitmapFactory.decodeResource(getResources(), R.drawable.late_morning);
-			lateNightImage = BitmapFactory.decodeResource(getResources(), R.drawable.late_night);
-			morningImage = BitmapFactory.decodeResource(getResources(), R.drawable.morning);
-			nightImage = BitmapFactory.decodeResource(getResources(), R.drawable.night);
+			afternoonImage = BitmapFactory.decodeResource(getResources(),
+					R.drawable.afternoon);
+			earlyMorningImage = BitmapFactory.decodeResource(getResources(),
+					R.drawable.early_morning);
+			eveningImage = BitmapFactory.decodeResource(getResources(),
+					R.drawable.evening);
+			lateAfternoonImage = BitmapFactory.decodeResource(getResources(),
+					R.drawable.late_afternoon);
+			lateEveningImage = BitmapFactory.decodeResource(getResources(),
+					R.drawable.late_evening);
+			lateMorningImage = BitmapFactory.decodeResource(getResources(),
+					R.drawable.late_morning);
+			lateNightImage = BitmapFactory.decodeResource(getResources(),
+					R.drawable.late_night);
+			morningImage = BitmapFactory.decodeResource(getResources(),
+					R.drawable.morning);
+			nightImage = BitmapFactory.decodeResource(getResources(),
+					R.drawable.night);
 		}
 
 		public void onCreate(SurfaceHolder surfaceHolder) {
@@ -93,10 +96,10 @@ public class LiveWallpaperService extends WallpaperService {
 				c.drawColor(Color.BLACK);
 				if (c != null) {
 					// get a scaled image that fills the height of the device
-					Bitmap background = createScaledImageFillHeight(getImageBasedOnHour(), c.getWidth(), c.getHeight());
+					Bitmap background = createScaledImageFillHeight(
+							getImageBasedOnHour(), c.getWidth(), c.getHeight());
 					// draw the background image
-					int x = 0;
-					c.drawBitmap(background, x, 0, null);
+					c.drawBitmap(background, 0, 0, null);
 
 					// get width of canvas
 					// int width = c.getWidth();
@@ -115,7 +118,7 @@ public class LiveWallpaperService extends WallpaperService {
 
 		private Bitmap getImageBasedOnHour() {
 			int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-			
+
 			if (hour >= 4 && hour < 7) {
 				return earlyMorningImage;
 			} else if (hour >= 7 && hour < 10) {
@@ -135,10 +138,11 @@ public class LiveWallpaperService extends WallpaperService {
 			} else {
 				return lateNightImage;
 			}
-			
+
 		}
 
-		private Bitmap createScaledImageFillWidth(Bitmap originalImage, int width, int height) {
+		private Bitmap createScaledImageFillWidth(Bitmap originalImage,
+				int width, int height) {
 			Bitmap scaledImage = Bitmap.createBitmap((int) width, (int) height,
 					Config.ARGB_8888);
 			float originalWidth = originalImage.getWidth(), originalHeight = originalImage
@@ -155,9 +159,11 @@ public class LiveWallpaperService extends WallpaperService {
 			canvas.drawBitmap(originalImage, transformation, paint);
 			return scaledImage;
 		}
-		
-		private Bitmap createScaledImageFillHeight(Bitmap originalImage, int width, int height) {
-			Bitmap scaledImage = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+
+		private Bitmap createScaledImageFillHeight(Bitmap originalImage,
+				int width, int height) {
+			Bitmap scaledImage = Bitmap.createBitmap(width, height,
+					Config.ARGB_8888);
 			float originalWidth = originalImage.getWidth(), originalHeight = originalImage
 					.getHeight();
 			Canvas canvas = new Canvas(scaledImage);
