@@ -2,6 +2,8 @@
 
 An Android live wallpaper that changes based on the time of day.
 
+Play Store URL: https://play.google.com/store/apps/details?id=com.bewareofraj.wallpaper.bitdaylivewallpaper
+
 ## Credits
 
 I did not create the wallpaper images myself, they were created by Reddit users.
