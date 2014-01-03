@@ -88,6 +88,7 @@ public class LiveWallpaperService extends WallpaperService {
 
 		public void draw() {
 			final SurfaceHolder holder = getSurfaceHolder();
+			Bitmap background;
 
 			Canvas c = null;
 			try {
@@ -96,10 +97,12 @@ public class LiveWallpaperService extends WallpaperService {
 				c.drawColor(Color.BLACK);
 				if (c != null) {
 					// get a scaled image that fills the height of the device
-					Bitmap background = createScaledImageFillHeight(
+					background = createScaledImageFillHeight(
 							getImageBasedOnHour(), c.getWidth(), c.getHeight());
 					// draw the background image
 					c.drawBitmap(background, 0, 0, null);
+					background.recycle();
+					background = null;
 				}
 			} finally {
 				if (c != null) {
