@@ -100,9 +100,6 @@ public class LiveWallpaperService extends WallpaperService {
 							getImageBasedOnHour(), c.getWidth(), c.getHeight());
 					// draw the background image
 					c.drawBitmap(background, 0, 0, null);
-
-					// get width of canvas
-					// int width = c.getWidth();
 				}
 			} finally {
 				if (c != null) {
