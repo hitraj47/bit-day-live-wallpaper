@@ -35,6 +35,8 @@ public class LiveWallpaperService extends WallpaperService {
 		public Bitmap afternoonImage, earlyMorningImage, eveningImage,
 				lateAfternoonImage, lateEveningImage, lateMorningImage,
 				lateNightImage, morningImage, nightImage;
+		
+		public Bitmap background;
 
 		public MyWallpaperEngine() {
 			// assign the resources for each image
@@ -88,7 +90,6 @@ public class LiveWallpaperService extends WallpaperService {
 
 		public void draw() {
 			final SurfaceHolder holder = getSurfaceHolder();
-			Bitmap background;
 
 			Canvas canvas = null;
 			try {
