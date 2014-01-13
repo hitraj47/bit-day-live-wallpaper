@@ -90,23 +90,23 @@ public class LiveWallpaperService extends WallpaperService {
 			final SurfaceHolder holder = getSurfaceHolder();
 			Bitmap background;
 
-			Canvas c = null;
+			Canvas canvas = null;
 			try {
-				c = holder.lockCanvas();
+				canvas = holder.lockCanvas();
 				// clear the canvas
-				c.drawColor(Color.BLACK);
-				if (c != null) {
+				canvas.drawColor(Color.BLACK);
+				if (canvas != null) {
 					// get a scaled image that fills the height of the device
 					background = createScaledImageFillHeight(
-							getImageBasedOnHour(), c.getWidth(), c.getHeight());
+							getImageBasedOnHour(), canvas.getWidth(), canvas.getHeight());
 					// draw the background image
-					c.drawBitmap(background, 0, 0, null);
+					canvas.drawBitmap(background, 0, 0, null);
 					background.recycle();
 					background = null;
 				}
 			} finally {
-				if (c != null) {
-					holder.unlockCanvasAndPost(c);
+				if (canvas != null) {
+					holder.unlockCanvasAndPost(canvas);
 				}
 			}
 
