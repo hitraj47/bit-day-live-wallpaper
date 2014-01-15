@@ -77,7 +77,10 @@ public class LiveWallpaperService extends WallpaperService {
 			// if screen wallpaper is visible then draw the image otherwise do
 			// not draw
 			if (visible) {
-				handler.post(drawRunner);
+				int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+				if (hourChanged(hour)) {
+					handler.post(drawRunner);
+				}
 			} else {
 				handler.removeCallbacks(drawRunner);
 			}
@@ -103,15 +106,12 @@ public class LiveWallpaperService extends WallpaperService {
 				// get the canvas object
 				canvas = holder.lockCanvas();
 				
-				// determine if a new background image needs to be created
-				int currentHour = Calendar.getInstance().get(
-						Calendar.HOUR_OF_DAY);
-				boolean createNewImage = shouldCreateNewImage(
-						canvas.getWidth(), canvas.getHeight(), currentHour);
+				// determine if the dimensions have changed
+				boolean dimensionsChanged = dimensionsChanged(canvas.getWidth(), canvas.getHeight());
 
 				// if createNewImage flag is true, it means hour or canvas dimensions changed
 				// new image is required
-				if (createNewImage) {
+				if (dimensionsChanged) {
 					
 					// clear the canvas
 					canvas.drawColor(Color.BLACK);
@@ -124,6 +124,8 @@ public class LiveWallpaperService extends WallpaperService {
 								canvas.getHeight());
 						// draw the background image
 						canvas.drawBitmap(background, 0, 0, null);
+						
+						//TODO: save this bitmap in a cache
 						background.recycle();
 						background = null;
 					}
@@ -136,7 +138,7 @@ public class LiveWallpaperService extends WallpaperService {
 
 			handler.removeCallbacks(drawRunner);
 			if (visible) {
-				handler.postDelayed(drawRunner, 10); // delay 10 milliseconds
+				//handler.postDelayed(drawRunner, 10); // delay 10 milliseconds
 			}
 		}
 		
