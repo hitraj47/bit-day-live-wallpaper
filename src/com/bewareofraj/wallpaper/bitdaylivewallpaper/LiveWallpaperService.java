@@ -2,6 +2,7 @@ package com.bewareofraj.wallpaper.bitdaylivewallpaper;
 
 import java.util.Calendar;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -11,6 +12,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 public class LiveWallpaperService extends WallpaperService {
@@ -35,8 +37,10 @@ public class LiveWallpaperService extends WallpaperService {
 		public Bitmap afternoonImage, earlyMorningImage, eveningImage,
 				lateAfternoonImage, lateEveningImage, lateMorningImage,
 				lateNightImage, morningImage, nightImage;
-		
+
 		public Bitmap background;
+
+		public static final String SHARED_PREFERENCES_FILE = "bitday_preferences";
 
 		public MyWallpaperEngine() {
 			// assign the resources for each image
@@ -93,17 +97,32 @@ public class LiveWallpaperService extends WallpaperService {
 
 			Canvas canvas = null;
 			try {
+				// get the canvas object
 				canvas = holder.lockCanvas();
-				// clear the canvas
-				canvas.drawColor(Color.BLACK);
-				if (canvas != null) {
-					// get a scaled image that fills the height of the device
-					background = createScaledImageFillHeight(
-							getImageBasedOnHour(), canvas.getWidth(), canvas.getHeight());
-					// draw the background image
-					canvas.drawBitmap(background, 0, 0, null);
-					background.recycle();
-					background = null;
+
+				// determine if a new background image needs to be created
+				int currentHour = Calendar.getInstance().get(
+						Calendar.HOUR_OF_DAY);
+				boolean createNewImage = shouldCreateNewImage(
+						canvas.getWidth(), canvas.getHeight(), currentHour);
+
+				// if createNewImage flag is true, it means hour or canvas dimensions changed
+				// new image is required
+				if (createNewImage) {
+					// clear the canvas
+					canvas.drawColor(Color.BLACK);
+
+					if (canvas != null) {
+						// get a scaled image that fills the height of the
+						// device
+						background = createScaledImageFillHeight(
+								getImageBasedOnHour(), canvas.getWidth(),
+								canvas.getHeight());
+						// draw the background image
+						canvas.drawBitmap(background, 0, 0, null);
+						background.recycle();
+						background = null;
+					}
 				}
 			} finally {
 				if (canvas != null) {
@@ -115,6 +134,14 @@ public class LiveWallpaperService extends WallpaperService {
 			if (visible) {
 				handler.postDelayed(drawRunner, 10); // delay 10 milliseconds
 			}
+		}
+
+		private boolean shouldCreateNewImage(int canvasWidth, int canvasHeight,
+				int currentHour) {
+			boolean createNewImage = false;
+			SharedPreferences settings = getSharedPreferences(
+					SHARED_PREFERENCES_FILE, 0);
+			return createNewImage;
 		}
 
 		private Bitmap getImageBasedOnHour() {
