@@ -102,7 +102,7 @@ public class LiveWallpaperService extends WallpaperService {
 			try {
 				// get the canvas object
 				canvas = holder.lockCanvas();
-
+				
 				// determine if a new background image needs to be created
 				int currentHour = Calendar.getInstance().get(
 						Calendar.HOUR_OF_DAY);
@@ -112,6 +112,7 @@ public class LiveWallpaperService extends WallpaperService {
 				// if createNewImage flag is true, it means hour or canvas dimensions changed
 				// new image is required
 				if (createNewImage) {
+					
 					// clear the canvas
 					canvas.drawColor(Color.BLACK);
 
@@ -192,25 +193,6 @@ public class LiveWallpaperService extends WallpaperService {
 				return lateNightImage;
 			}
 
-		}
-
-		private Bitmap createScaledImageFillWidth(Bitmap originalImage,
-				int width, int height) {
-			Bitmap scaledImage = Bitmap.createBitmap((int) width, (int) height,
-					Config.ARGB_8888);
-			float originalWidth = originalImage.getWidth(), originalHeight = originalImage
-					.getHeight();
-			Canvas canvas = new Canvas(scaledImage);
-			float scale = width / originalWidth;
-			float xTranslation = 0.0f, yTranslation = (height - originalHeight
-					* scale) / 2.0f;
-			Matrix transformation = new Matrix();
-			transformation.postTranslate(xTranslation, yTranslation);
-			transformation.preScale(scale, scale);
-			Paint paint = new Paint();
-			paint.setFilterBitmap(true);
-			canvas.drawBitmap(originalImage, transformation, paint);
-			return scaledImage;
 		}
 
 		private Bitmap createScaledImageFillHeight(Bitmap originalImage,
