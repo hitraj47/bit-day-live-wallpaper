@@ -41,6 +41,9 @@ public class LiveWallpaperService extends WallpaperService {
 		public Bitmap background;
 
 		public static final String SHARED_PREFERENCES_FILE = "bitday_preferences";
+		public static final String PREFERENCES_WIDTH = "bitday_width";
+		public static final String PREFERENCES_HEIGHT = "bitday_height";
+		public static final String PREFERENCES_HOUR = "bitday_hour";
 
 		public MyWallpaperEngine() {
 			// assign the resources for each image
@@ -141,6 +144,28 @@ public class LiveWallpaperService extends WallpaperService {
 			boolean createNewImage = false;
 			SharedPreferences settings = getSharedPreferences(
 					SHARED_PREFERENCES_FILE, 0);
+			SharedPreferences.Editor editor = settings.edit();
+			
+			int width = settings.getInt(PREFERENCES_WIDTH, 0);
+			if (canvasWidth != width) {
+				createNewImage = true; 
+				editor.putInt(PREFERENCES_WIDTH, canvasWidth);
+				editor.commit();
+			}
+			
+			int height = settings.getInt(PREFERENCES_HEIGHT, 0);
+			if (canvasHeight != height) {
+				createNewImage = true;
+				editor.putInt(PREFERENCES_HEIGHT, canvasHeight);
+				editor.commit();
+			}
+			
+			int hour = settings.getInt(PREFERENCES_HOUR, 25);
+			if (currentHour != hour) {
+				createNewImage = true;
+				editor.putInt(PREFERENCES_HOUR, currentHour);
+				editor.commit();
+			}
 			return createNewImage;
 		}
 
