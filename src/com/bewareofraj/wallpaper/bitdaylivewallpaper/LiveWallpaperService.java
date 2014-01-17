@@ -2,6 +2,7 @@ package com.bewareofraj.wallpaper.bitdaylivewallpaper;
 
 import java.util.Calendar;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -12,6 +13,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
@@ -32,8 +34,10 @@ public class LiveWallpaperService extends WallpaperService {
 			}
 		};
 		private boolean visible = true;
+		
+		private LruCache<String, Bitmap> mMemoryCache;
 
-		// Wallpaper images
+		// Original wallpaper images
 		public Bitmap afternoonImage, earlyMorningImage, eveningImage,
 				lateAfternoonImage, lateEveningImage, lateMorningImage,
 				lateNightImage, morningImage, nightImage;
@@ -65,6 +69,32 @@ public class LiveWallpaperService extends WallpaperService {
 					R.drawable.morning);
 			nightImage = BitmapFactory.decodeResource(getResources(),
 					R.drawable.night);
+			
+			final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+
+		    // Use 1/8th of the available memory for this memory cache.
+		    final int cacheSize = maxMemory / 8;
+
+		    mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+		    	//TODO: Determine if this should be here or increase min API
+		        @SuppressLint("NewApi")
+				@Override
+		        protected int sizeOf(String key, Bitmap bitmap) {
+		            // The cache size will be measured in kilobytes rather than
+		            // number of items.
+		            return bitmap.getByteCount() / 1024;
+		        }
+		    };
+		}
+		
+		public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+		    if (getBitmapFromMemCache(key) == null) {
+		        mMemoryCache.put(key, bitmap);
+		    }
+		}
+
+		public Bitmap getBitmapFromMemCache(String key) {
+		    return mMemoryCache.get(key);
 		}
 
 		public void onCreate(SurfaceHolder surfaceHolder) {
@@ -126,10 +156,13 @@ public class LiveWallpaperService extends WallpaperService {
 						// draw the background image
 						canvas.drawBitmap(background, 0, 0, null);
 
-						// TODO: save this bitmap in a cache
+						addBitmapToMemoryCache(Integer.toString(currentHour), background);
+						
 						background.recycle();
 						background = null;
 					}
+				} else {
+					canvas.drawBitmap(getBitmapFromMemCache(Integer.toString(currentHour)), 0, 0, null);
 				}
 			} finally {
 				if (canvas != null) {
