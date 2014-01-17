@@ -72,7 +72,7 @@ public class LiveWallpaperService extends WallpaperService {
 			
 			final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
 
-		    // Use 1/8th of the available memory for this memory cache.
+		    // Use 1/8 of the available memory for this memory cache.
 		    final int cacheSize = maxMemory / 8;
 
 		    mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
@@ -157,12 +157,12 @@ public class LiveWallpaperService extends WallpaperService {
 						canvas.drawBitmap(background, 0, 0, null);
 
 						addBitmapToMemoryCache(Integer.toString(currentHour), background);
-						
-						background.recycle();
-						background = null;
 					}
 				} else {
-					canvas.drawBitmap(getBitmapFromMemCache(Integer.toString(currentHour)), 0, 0, null);
+					if (canvas != null) {
+						canvas.drawBitmap(getBitmapFromMemCache(Integer.toString(currentHour)), 0, 0, null);
+					}
+					
 				}
 			} finally {
 				if (canvas != null) {
