@@ -77,10 +77,7 @@ public class LiveWallpaperService extends WallpaperService {
 			// if screen wallpaper is visible then draw the image otherwise do
 			// not draw
 			if (visible) {
-				int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-				if (hourChanged(hour)) {
-					handler.post(drawRunner);
-				}
+				handler.post(drawRunner);
 			} else {
 				handler.removeCallbacks(drawRunner);
 			}
@@ -105,14 +102,18 @@ public class LiveWallpaperService extends WallpaperService {
 			try {
 				// get the canvas object
 				canvas = holder.lockCanvas();
-				
-				// determine if the dimensions have changed
-				boolean dimensionsChanged = dimensionsChanged(canvas.getWidth(), canvas.getHeight());
 
-				// if createNewImage flag is true, it means hour or canvas dimensions changed
-				// new image is required
-				if (dimensionsChanged) {
-					
+				// determine if the dimensions have changed
+				boolean dimensionsChanged = dimensionsChanged(
+						canvas.getWidth(), canvas.getHeight());
+
+				// determine if the hour has been changed
+				int currentHour = Calendar.getInstance().get(
+						Calendar.HOUR_OF_DAY);
+				boolean hourChanged = hourChanged(currentHour);
+
+				if (dimensionsChanged || hourChanged) {
+
 					// clear the canvas
 					canvas.drawColor(Color.BLACK);
 
@@ -124,8 +125,8 @@ public class LiveWallpaperService extends WallpaperService {
 								canvas.getHeight());
 						// draw the background image
 						canvas.drawBitmap(background, 0, 0, null);
-						
-						//TODO: save this bitmap in a cache
+
+						// TODO: save this bitmap in a cache
 						background.recycle();
 						background = null;
 					}
@@ -138,47 +139,48 @@ public class LiveWallpaperService extends WallpaperService {
 
 			handler.removeCallbacks(drawRunner);
 			if (visible) {
-				//handler.postDelayed(drawRunner, 10); // delay 10 milliseconds
+				// handler.postDelayed(drawRunner, 10); // delay 10 milliseconds
 			}
 		}
-		
+
 		private boolean dimensionsChanged(int canvasWidth, int canvasHeight) {
 			boolean dimensionsChanged = false;
-			SharedPreferences settings = getSharedPreferences(SHARED_PREFERENCES_FILE, 0);
+			SharedPreferences settings = getSharedPreferences(
+					SHARED_PREFERENCES_FILE, 0);
 			SharedPreferences.Editor editor = settings.edit();
-			
+
 			int width = settings.getInt(PREFERENCES_WIDTH, 0);
 			if (canvasWidth != width) {
 				dimensionsChanged = true;
 				editor.putInt(PREFERENCES_WIDTH, canvasWidth);
 				editor.commit();
 			}
-			
+
 			int height = settings.getInt(PREFERENCES_HEIGHT, 0);
 			if (canvasHeight != height) {
 				dimensionsChanged = true;
 				editor.putInt(PREFERENCES_HEIGHT, canvasHeight);
 				editor.commit();
 			}
-			
+
 			return dimensionsChanged;
 		}
-		
+
 		private boolean hourChanged(int currentHour) {
 			boolean hourChanged = false;
-			SharedPreferences settings = getSharedPreferences(SHARED_PREFERENCES_FILE, 0);
+			SharedPreferences settings = getSharedPreferences(
+					SHARED_PREFERENCES_FILE, 0);
 			SharedPreferences.Editor editor = settings.edit();
-			
+
 			int hour = settings.getInt(PREFERENCES_HOUR, 25);
 			if (currentHour != hour) {
 				hourChanged = true;
 				editor.putInt(PREFERENCES_HOUR, currentHour);
 				editor.commit();
 			}
-			
+
 			return hourChanged;
 		}
-
 
 		private Bitmap getImageBasedOnHour() {
 			int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
