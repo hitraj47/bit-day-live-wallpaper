@@ -180,9 +180,6 @@ public class LiveWallpaperService extends WallpaperService {
 			}
 
 			handler.removeCallbacks(drawRunner);
-			if (visible) {
-				// handler.postDelayed(drawRunner, 10); // delay 10 milliseconds
-			}
 		}
 		
 		private boolean bitmapNotCached(String key) {
