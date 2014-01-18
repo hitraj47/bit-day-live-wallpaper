@@ -1,7 +1,6 @@
 package com.bewareofraj.wallpaper.bitdaylivewallpaper;
 
 import java.util.Calendar;
-
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -32,24 +31,59 @@ public class LiveWallpaperService extends WallpaperService {
 				draw();
 			}
 		};
+		
+		/**
+		 * Flag to determine if the wallpaper is visible or not.
+		 */
 		private boolean visible = true;
 
+		/**
+		 * A memory cache to store created/resized bitmaps.
+		 */
 		private LruCache<String, Bitmap> mMemoryCache;
 
-		// Original wallpaper images
+		/**
+		 * The original wallpaper images.
+		 */
 		private final Bitmap afternoonImage, earlyMorningImage, eveningImage,
 				lateAfternoonImage, lateEveningImage, lateMorningImage,
 				lateNightImage, morningImage, nightImage;
 
+		/**
+		 * The Bitmap that will store the resized image for the device's wallpaper.
+		 */
 		private Bitmap background;
 		
+		/**
+		 * The wallpaper Canvas that will be drawn to.
+		 */
 		private Canvas canvas;
 
+		/**
+		 * Shared preferences file to store information that determines if a new image needs to be created and cached.
+		 */
 		public static final String SHARED_PREFERENCES_FILE = "bitday_preferences";
+		
+		/**
+		 * The key for the last used width preference.
+		 */
 		public static final String PREFERENCES_WIDTH = "bitday_width";
+		
+		/**
+		 * The key for the last used height preference.
+		 */
 		public static final String PREFERENCES_HEIGHT = "bitday_height";
+		
+		/**
+		 * The key for the last used hour preference.
+		 */
 		public static final String PREFERENCES_HOUR = "bitday_hour";
 
+		/**
+		 * The constructor for MyWallpaperEngine.
+		 * Initialized and sets the Bitmaps for the original wallpaper images.
+		 * Also sets up the memory cache.
+		 */
 		public MyWallpaperEngine() {
 			// assign the resources for each image
 			afternoonImage = BitmapFactory.decodeResource(getResources(),
@@ -89,12 +123,22 @@ public class LiveWallpaperService extends WallpaperService {
 			
 		}
 
+		/**
+		 * Adds a Bitmap to the memory cache.
+		 * @param key Value that will be used to store and retrieve the Bitmap.
+		 * @param bitmap The Bitmap that will be cached.
+		 */
 		public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
 			if (getBitmapFromMemCache(key) == null) {
 				mMemoryCache.put(key, bitmap);
 			}
 		}
 
+		/**
+		 * Retrieve a Bitmap based on the key.
+		 * @param key The key value that was used to initially store the Bitmap.
+		 * @return The Bitmap associated with teh key, or null if the Bitmap does not exist for the specified key.
+		 */
 		public Bitmap getBitmapFromMemCache(String key) {
 			return mMemoryCache.get(key);
 		}
@@ -103,6 +147,9 @@ public class LiveWallpaperService extends WallpaperService {
 			super.onCreate(surfaceHolder);
 		}
 
+		/**
+		 * This method is called when the visibility of the wallpaper background changes.
+		 */
 		@Override
 		public void onVisibilityChanged(boolean _visible) {
 			visible = _visible;
@@ -122,11 +169,20 @@ public class LiveWallpaperService extends WallpaperService {
 			handler.removeCallbacks(drawRunner);
 		}
 
+		/**
+		 * This method is called when the screen offsets are changed.
+		 * e.g. when the user flips through their home screens.
+		 */
 		public void onOffsetsChanged(float xOffset, float yOffset, float xStep,
 				float yStep, int xPixels, int yPixels) {
 			draw();
 		}
 
+		/**
+		 * This is the main method for the app.
+		 * It will try to get the Canvas on which the wallpaper is drawn.
+		 * Will then determine if a new image needs to be created or not, and then draws the appropriate image onto the canvas.
+		 */
 		public void draw() {
 			final SurfaceHolder holder = getSurfaceHolder();
 			
@@ -182,6 +238,11 @@ public class LiveWallpaperService extends WallpaperService {
 			handler.removeCallbacks(drawRunner);
 		}
 		
+		/**
+		 * Checks if a cached version of the Bitmap we want to draw exists.
+		 * @param key The value used to store the Bitmap.
+		 * @return Returns true if the Bitmap does NOT exist in the cache.
+		 */
 		private boolean bitmapNotCached(String key) {
 			boolean bitmapNotCached = false;
 			if (mMemoryCache.get(key) == null) {
@@ -190,6 +251,12 @@ public class LiveWallpaperService extends WallpaperService {
 			return bitmapNotCached;
 		}
 
+		/**
+		 * Determines if the screen width or height has changed. If either has changed, the SharedPreferences is updated with the new values.
+		 * @param canvasWidth The current width of the canvas.
+		 * @param canvasHeight The current height of the canvas.
+		 * @return Returns true if either the width or height has changed.
+		 */
 		private boolean dimensionsChanged(int canvasWidth, int canvasHeight) {
 			boolean dimensionsChanged = false;
 			SharedPreferences settings = getSharedPreferences(
@@ -213,6 +280,11 @@ public class LiveWallpaperService extends WallpaperService {
 			return dimensionsChanged;
 		}
 
+		/**
+		 * Determines if the hour has changed. If the hour is changed, the SharedPreferences is updated.
+		 * @param currentHour The current hour.
+		 * @return Returns true if the current hour is different from the one last saved.
+		 */
 		private boolean hourChanged(int currentHour) {
 			boolean hourChanged = false;
 			SharedPreferences settings = getSharedPreferences(
@@ -229,6 +301,10 @@ public class LiveWallpaperService extends WallpaperService {
 			return hourChanged;
 		}
 
+		/**
+		 * Determines which image to show based on the current hour.
+		 * @return A Bitmap of the original image.
+		 */
 		private Bitmap getImageBasedOnHour() {
 			int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
 
@@ -254,6 +330,13 @@ public class LiveWallpaperService extends WallpaperService {
 
 		}
 
+		/**
+		 * Creates a scaled/resized image that fills the height of the screen/device.
+		 * @param originalImage The Bitmap image to resize.
+		 * @param width The target width that the new image needs to be.
+		 * @param height The target height the new image needs to be.
+		 * @return The rescaled Bitmap.
+		 */
 		private Bitmap createScaledImageFillHeight(Bitmap originalImage,
 				int width, int height) {
 			Bitmap scaledImage = Bitmap.createBitmap(width, height,
