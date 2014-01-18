@@ -77,7 +77,6 @@ public class LiveWallpaperService extends WallpaperService {
 
 		    mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
 		    	//TODO: Determine if this should be here or increase min API
-		        @SuppressLint("NewApi")
 				@Override
 		        protected int sizeOf(String key, Bitmap bitmap) {
 		            // The cache size will be measured in kilobytes rather than
@@ -162,7 +161,6 @@ public class LiveWallpaperService extends WallpaperService {
 					if (canvas != null) {
 						canvas.drawBitmap(getBitmapFromMemCache(Integer.toString(currentHour)), 0, 0, null);
 					}
-					
 				}
 			} finally {
 				if (canvas != null) {
