@@ -2,6 +2,7 @@ package com.bewareofraj.wallpaper.bitdaylivewallpaper;
 
 import java.util.Calendar;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -36,11 +37,13 @@ public class LiveWallpaperService extends WallpaperService {
 		private LruCache<String, Bitmap> mMemoryCache;
 
 		// Original wallpaper images
-		public Bitmap afternoonImage, earlyMorningImage, eveningImage,
+		private final Bitmap afternoonImage, earlyMorningImage, eveningImage,
 				lateAfternoonImage, lateEveningImage, lateMorningImage,
 				lateNightImage, morningImage, nightImage;
 
-		public Bitmap background;
+		private Bitmap background;
+		
+		private Canvas canvas;
 
 		public static final String SHARED_PREFERENCES_FILE = "bitday_preferences";
 		public static final String PREFERENCES_WIDTH = "bitday_width";
@@ -75,6 +78,7 @@ public class LiveWallpaperService extends WallpaperService {
 
 			mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
 				// TODO: Determine if this should be here or increase min API
+				@SuppressLint("NewApi")
 				@Override
 				protected int sizeOf(String key, Bitmap bitmap) {
 					// The cache size will be measured in kilobytes rather than
@@ -82,6 +86,7 @@ public class LiveWallpaperService extends WallpaperService {
 					return bitmap.getByteCount() / 1024;
 				}
 			};
+			
 		}
 
 		public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
@@ -124,8 +129,7 @@ public class LiveWallpaperService extends WallpaperService {
 
 		public void draw() {
 			final SurfaceHolder holder = getSurfaceHolder();
-
-			Canvas canvas = null;
+			
 			try {
 				// get the canvas object
 				canvas = holder.lockCanvas();
@@ -138,8 +142,15 @@ public class LiveWallpaperService extends WallpaperService {
 				int currentHour = Calendar.getInstance().get(
 						Calendar.HOUR_OF_DAY);
 				boolean hourChanged = hourChanged(currentHour);
+				
+				StringBuilder bitmapKey = new StringBuilder();
+				bitmapKey.append(Integer.toString(currentHour));
+				bitmapKey.append(Integer.toString(canvas.getWidth()));
+				bitmapKey.append(Integer.toString(canvas.getHeight()));
+				
+				boolean bitmapNotCached = bitmapNotCached(bitmapKey.toString());
 
-				if (dimensionsChanged || hourChanged) {
+				if (dimensionsChanged || hourChanged || bitmapNotCached) {
 
 					// clear the canvas
 					canvas.drawColor(Color.BLACK);
@@ -153,13 +164,13 @@ public class LiveWallpaperService extends WallpaperService {
 						// draw the background image
 						canvas.drawBitmap(background, 0, 0, null);
 
-						addBitmapToMemoryCache(Integer.toString(currentHour),
-								background);
+						addBitmapToMemoryCache(bitmapKey.toString(), background);
+						
+						background = null;
 					}
 				} else {
 					if (canvas != null) {
-						canvas.drawBitmap(getBitmapFromMemCache(Integer
-								.toString(currentHour)), 0, 0, null);
+						canvas.drawBitmap(getBitmapFromMemCache(bitmapKey.toString()), 0, 0, null);
 					}
 				}
 			} finally {
@@ -172,6 +183,14 @@ public class LiveWallpaperService extends WallpaperService {
 			if (visible) {
 				// handler.postDelayed(drawRunner, 10); // delay 10 milliseconds
 			}
+		}
+		
+		private boolean bitmapNotCached(String key) {
+			boolean bitmapNotCached = false;
+			if (mMemoryCache.get(key) == null) {
+				bitmapNotCached = true;
+			}
+			return bitmapNotCached;
 		}
 
 		private boolean dimensionsChanged(int canvasWidth, int canvasHeight) {
