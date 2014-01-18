@@ -104,8 +104,8 @@ public class LiveWallpaperService extends WallpaperService {
 		}
 
 		@Override
-		public void onVisibilityChanged(boolean visible) {
-			this.visible = visible;
+		public void onVisibilityChanged(boolean _visible) {
+			visible = _visible;
 			// if screen wallpaper is visible then draw the image otherwise do
 			// not draw
 			if (visible) {
@@ -118,7 +118,7 @@ public class LiveWallpaperService extends WallpaperService {
 		@Override
 		public void onSurfaceDestroyed(SurfaceHolder holder) {
 			super.onSurfaceDestroyed(holder);
-			this.visible = false;
+			visible = false;
 			handler.removeCallbacks(drawRunner);
 		}
 
