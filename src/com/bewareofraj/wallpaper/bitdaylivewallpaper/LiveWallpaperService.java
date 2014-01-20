@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
 import android.support.v4.util.LruCache;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 public class LiveWallpaperService extends WallpaperService {
@@ -110,11 +109,13 @@ public class LiveWallpaperService extends WallpaperService {
 			nightImage = BitmapFactory.decodeResource(getResources(),
 					R.drawable.night);
 
+			// get max memory
 			final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
 
 			// Use 1/8 of the available memory for this memory cache.
 			final int cacheSize = maxMemory / 8;
 
+			// create memory cache
 			mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
 				// TODO: Determine if this should be here or increase min API
 				@SuppressLint("NewApi")
@@ -124,6 +125,7 @@ public class LiveWallpaperService extends WallpaperService {
 					// number of items.
 					return bitmap.getByteCount() / 1024;
 				}
+
 			};
 
 		}
@@ -147,7 +149,7 @@ public class LiveWallpaperService extends WallpaperService {
 		 * 
 		 * @param key
 		 *            The key value that was used to initially store the Bitmap.
-		 * @return The Bitmap associated with teh key, or null if the Bitmap
+		 * @return The Bitmap associated with the key, or null if the Bitmap
 		 *         does not exist for the specified key.
 		 */
 		public Bitmap getBitmapFromMemCache(String key) {
@@ -216,32 +218,36 @@ public class LiveWallpaperService extends WallpaperService {
 			bitmapKey.append(Integer.toString(currentHeight));
 			boolean bitmapNotCached = bitmapNotCached(bitmapKey.toString());
 
-			final SurfaceHolder holder = getSurfaceHolder();
+			if (dimensionsChanged || hourChanged || bitmapNotCached) {
 
-			try {
-				// get the canvas object
-				canvas = holder.lockCanvas();
+				final SurfaceHolder holder = getSurfaceHolder();
 
-				// clear the canvas
-				canvas.drawColor(Color.BLACK);
+				try {
+					// get the canvas object
+					canvas = holder.lockCanvas();
 
-				if (canvas != null) {
-					// get a scaled image that fills the height of the
-					// device
-					background = createScaledImageFillHeight(
-							getImageBasedOnHour(), canvas.getWidth(),
-							canvas.getHeight());
-					// draw the background image
-					canvas.drawBitmap(background, 0, 0, null);
+					// clear the canvas
+					canvas.drawColor(Color.BLACK);
 
-					addBitmapToMemoryCache(bitmapKey.toString(), background);
+					if (canvas != null) {
+						// get a scaled image that fills the height of the
+						// device
+						background = createScaledImageFillHeight(
+								getImageBasedOnHour(), canvas.getWidth(),
+								canvas.getHeight());
+						// draw the background image
+						canvas.drawBitmap(background, 0, 0, null);
 
-					background = null;
+						addBitmapToMemoryCache(bitmapKey.toString(), background);
+
+						background = null;
+					}
+				} finally {
+					if (canvas != null) {
+						holder.unlockCanvasAndPost(canvas);
+					}
 				}
-			} finally {
-				if (canvas != null) {
-					holder.unlockCanvasAndPost(canvas);
-				}
+
 			}
 
 			handler.removeCallbacks(drawRunner);
@@ -380,6 +386,7 @@ public class LiveWallpaperService extends WallpaperService {
 			canvas.drawBitmap(originalImage, transformation, paint);
 			return scaledImage;
 		}
+
 	}
 
 }
