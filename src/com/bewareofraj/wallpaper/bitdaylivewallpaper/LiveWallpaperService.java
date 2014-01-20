@@ -222,6 +222,8 @@ public class LiveWallpaperService extends WallpaperService {
 
 				final SurfaceHolder holder = getSurfaceHolder();
 
+				canvas = null;
+				
 				try {
 					// get the canvas object
 					canvas = holder.lockCanvas();
