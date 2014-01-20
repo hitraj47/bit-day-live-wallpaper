@@ -8,6 +8,10 @@ Play Store URL: https://play.google.com/store/apps/details?id=com.bewareofraj.wa
 
 I did not create the wallpaper images myself, they were created by Reddit users.
 
+For more information, please see this Reddit thread: http://www.reddit.com/r/wallpapers/comments/1u2eyr/bit_day_android_live_wallpaper/
+
+The original wallpaper thread here: http://www.reddit.com/r/wallpapers/comments/1tqe9k/update_new_version_of_the_8bit_day_wallpaper_set/
+
 ## Proposed Improvements
 
 * I'm rubbish with graphics, perhaps a better looking icon?
