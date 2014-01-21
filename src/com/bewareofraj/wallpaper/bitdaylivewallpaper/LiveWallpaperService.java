@@ -2,6 +2,7 @@ package com.bewareofraj.wallpaper.bitdaylivewallpaper;
 
 import java.util.Calendar;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -10,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
 import android.support.v4.util.LruCache;
@@ -117,13 +119,18 @@ public class LiveWallpaperService extends WallpaperService {
 
 			// create memory cache
 			mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
-				// TODO: Determine if this should be here or increase min API
 				@SuppressLint("NewApi")
 				@Override
 				protected int sizeOf(String key, Bitmap bitmap) {
 					// The cache size will be measured in kilobytes rather than
-					// number of items.
-					return bitmap.getByteCount() / 1024;
+					// number of items. Also, getByteCount() only works on API
+					// >= 12, if not, use bitmap.getRowBytes()
+					if (Integer.valueOf(android.os.Build.VERSION.SDK_INT) >= 12) {
+						return bitmap.getByteCount() / 1024;
+					} else {
+						return (bitmap.getRowBytes() * bitmap.getHeight()) / 1024;
+					}
+
 				}
 
 			};
@@ -223,7 +230,7 @@ public class LiveWallpaperService extends WallpaperService {
 				final SurfaceHolder holder = getSurfaceHolder();
 
 				canvas = null;
-				
+
 				try {
 					// get the canvas object
 					canvas = holder.lockCanvas();
