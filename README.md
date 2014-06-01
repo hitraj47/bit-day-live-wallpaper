@@ -16,3 +16,7 @@ The original wallpaper thread here: http://www.reddit.com/r/wallpapers/comments/
 
  - master: Latest development branch, pull this for the most up to date, but potentionally unstable version.
  - production: Latest version available in the Google Play store.
+
+## Bugs/Feature Requests/Enhancements
+
+Please see the "Issues" section on the Github repository for a full list.
