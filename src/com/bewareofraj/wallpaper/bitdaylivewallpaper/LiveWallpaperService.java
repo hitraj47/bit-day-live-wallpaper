@@ -1,6 +1,5 @@
 package com.bewareofraj.wallpaper.bitdaylivewallpaper;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.content.BroadcastReceiver;
@@ -20,88 +19,81 @@ import android.service.wallpaper.WallpaperService;
 import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 
-
-public class BitDayLiveWallpaperService extends WallpaperService {
+public class LiveWallpaperService extends WallpaperService {
 	
-	private static BroadcastReceiver receiver;
-	private static ArrayList<BitDayLiveEngine> engines = new ArrayList<BitDayLiveEngine>();
-	
-	@Override public void onCreate() {
-		super.onCreate();
-		receiver = new BroadcastReceiver() {
-			
-			private int lastHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-			
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				int currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-				
-				if(lastHour != currentHour)
-					for(BitDayLiveEngine engine : engines)
-						if(engine.isVisible()) 
-							engine.draw();
-					
-				lastHour = currentHour;
-			}
-		};
-		IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
-		filter.matchAction(Intent.ACTION_TIME_CHANGED);
-		filter.matchAction(Intent.ACTION_TIMEZONE_CHANGED);
-		
-		registerReceiver(receiver, filter);
-	}
-
-	@Override public void onDestroy() {
-		super.onDestroy();
-		if(receiver != null) 
-			unregisterReceiver(receiver);
-	}
-
 	@Override public Engine onCreateEngine() {
-		BitDayLiveEngine engine = new BitDayLiveEngine();
-		engines.add(engine);
-		return engine;
+		return new BitDayLiveEngine();
 	}
 	
 	public class BitDayLiveEngine extends Engine {
 
+		private BroadcastReceiver receiver = null;
+		
 		private final Handler handler = new Handler();
 		
-		private final Runnable drawRunner = new Runnable() {
-			@Override public void run() { draw(); }
-		};
+		private final Runnable drawRunner = 
+			new Runnable() {
+				@Override public void run() { draw(); }
+			};
 		
-		private float 
-			xOffset, 
-			yOffset;
+		private float xOffset = 0.5f, yOffset = 0.5f;
 		
-		private Bitmap 
-			lastBackground       = null,
-			lastBackgroundScaled = null;
-		
-		private int
-			lastLevel  = -1,
-			lastWidth  = -1,
-			lastHeight = -1;
+		private Bitmap lastBackground = null, lastBackgroundScaled = null;
 
+		private int lastLevel = -1, lastWidth = -1, lastHeight = -1;
+		
 		@Override public void onVisibilityChanged(boolean visible) {		
-			if (visible) 
-				handler.post(drawRunner); 
-			else 
+			
+			if (visible) {
+				handler.post(drawRunner);
+				IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
+				filter.matchAction(Intent.ACTION_TIME_CHANGED);
+				filter.matchAction(Intent.ACTION_TIMEZONE_CHANGED);
+				
+				receiver = new BroadcastReceiver() {
+					
+					private int lastHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+					
+					@Override
+					public void onReceive(Context context, Intent intent) {
+						int currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+
+						if(lastHour != currentHour) 
+							draw();
+						
+						lastHour = currentHour;
+					}
+				};
+
+				registerReceiver(receiver, filter);
+			} else { 
 				handler.removeCallbacks(drawRunner);
+				unregisterReceiver(receiver);
+				receiver = null;
+			}
 		}
 
 		@Override public void onSurfaceDestroyed(SurfaceHolder holder) {
 			super.onSurfaceDestroyed(holder);
 			handler.removeCallbacks(drawRunner);
+			if (receiver != null) {
+				unregisterReceiver(receiver);
+				receiver = null;				
+			}
 		}
 
 		@Override public void onOffsetsChanged(float xOffset, float yOffset, float xStep, float yStep, int xPixels, int yPixels) {
-			this.xOffset = xOffset; this.yOffset = yOffset;
+			this.xOffset = xOffset; 
+			this.yOffset = yOffset;
 			draw();
 		}
-
+		
 		public void draw() {
+			
+			if(isPreview()) {
+				xOffset = yOffset = 0.5f;
+			}
+			
 			final SurfaceHolder holder = getSurfaceHolder();
 			
 			Canvas canvas = null;
@@ -197,6 +189,5 @@ public class BitDayLiveWallpaperService extends WallpaperService {
 			
 			return scaledImage;
 		}
-		
 	}
 }
