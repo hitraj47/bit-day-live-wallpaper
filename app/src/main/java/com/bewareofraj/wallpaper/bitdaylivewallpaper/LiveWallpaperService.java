@@ -127,21 +127,21 @@ public class LiveWallpaperService extends WallpaperService {
         private int getBackgroundIdByLevel(int level) {
             switch (level) {
                 case 0:
-                    return R.drawable.hour_00_03;
+                    return R.drawable.night;
                 case 1:
-                    return R.drawable.hour_03_06;
+                    return R.drawable.late_night;
                 case 2:
-                    return R.drawable.hour_06_09;
+                    return R.drawable.early_morning;
                 case 3:
-                    return R.drawable.hour_09_12;
+                    return R.drawable.morning;
                 case 4:
-                    return R.drawable.hour_12_15;
+                    return R.drawable.day;
                 case 5:
-                    return R.drawable.hour_15_18;
+                    return R.drawable.afternoon;
                 case 6:
-                    return R.drawable.hour_18_21;
+                    return R.drawable.evening;
                 default:
-                    return R.drawable.hour_21_24;
+                    return R.drawable.late_evening;
             }
         }
 
