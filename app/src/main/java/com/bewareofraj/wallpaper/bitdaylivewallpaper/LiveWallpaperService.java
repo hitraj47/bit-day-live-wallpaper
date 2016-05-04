@@ -58,8 +58,9 @@ public class LiveWallpaperService extends WallpaperService {
                     public void onReceive(Context context, Intent intent) {
                         int currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
 
-                        if (lastHour != currentHour)
+                        if (lastHour != currentHour) {
                             draw();
+                        }
 
                         lastHour = currentHour;
                     }
@@ -67,20 +68,14 @@ public class LiveWallpaperService extends WallpaperService {
 
                 registerReceiver(receiver, filter);
             } else {
-                handler.removeCallbacks(drawRunner);
-                unregisterReceiver(receiver);
-                receiver = null;
+                killResources();
             }
         }
 
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
             super.onSurfaceDestroyed(holder);
-            handler.removeCallbacks(drawRunner);
-            if (receiver != null) {
-                unregisterReceiver(receiver);
-                receiver = null;
-            }
+            killResources();
         }
 
         @Override
@@ -88,6 +83,14 @@ public class LiveWallpaperService extends WallpaperService {
             this.xOffset = xOffset;
             this.yOffset = yOffset;
             draw();
+        }
+
+        private void killResources() {
+            handler.removeCallbacks(drawRunner);
+            if (receiver != null) {
+                unregisterReceiver(receiver);
+                receiver = null;
+            }
         }
 
         public void draw() {
