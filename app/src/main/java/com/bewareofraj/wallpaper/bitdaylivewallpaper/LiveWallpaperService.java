@@ -32,7 +32,7 @@ public class LiveWallpaperService extends WallpaperService {
         private BroadcastReceiver receiver = null;
         private float xOffset = 0.5f, yOffset = 0.5f;
         private Bitmap lastBackground = null, lastBackgroundScaled = null;
-        private int lastLevel = -1, lastWidth = -1, lastHeight = -1;
+        private int lastHour = -1, lastWidth = -1, lastHeight = -1;
         private final Runnable drawRunner =
                 new Runnable() {
                     @Override
@@ -124,25 +124,31 @@ public class LiveWallpaperService extends WallpaperService {
             handler.removeCallbacks(drawRunner);
         }
 
-        private int getBackgroundIdByLevel(int level) {
-            switch (level) {
-                case 0:
-                    return R.drawable.night;
-                case 1:
-                    return R.drawable.late_night;
-                case 2:
-                    return R.drawable.early_morning;
-                case 3:
-                    return R.drawable.morning;
-                case 4:
-                    return R.drawable.day;
-                case 5:
-                    return R.drawable.afternoon;
-                case 6:
-                    return R.drawable.evening;
-                default:
-                    return R.drawable.late_evening;
-            }
+        private int getBackgroundForHour(int hour) {
+            if (hour >= 23 || hour <= 2)
+                return R.drawable.wall11_late_night;
+            else if (hour >= 22)
+                return R.drawable.wall10_mid_night;
+            else if (hour >= 21)
+                return R.drawable.wall9_early_night;
+            else if (hour >= 19)
+                return R.drawable.wall8_late_evening;
+            else if (hour >= 16)
+                return R.drawable.wall7_mid_evening;
+            else if (hour >= 15)
+                return R.drawable.wall6_early_evening;
+            else if (hour >= 13)
+                return R.drawable.wall5_late_afternoon;
+            else if (hour >= 12)
+                return R.drawable.wall4_mid_afternoon;
+            else if (hour >= 10)
+                return R.drawable.wall3_early_afternoon;
+            else if (hour >= 7)
+                return R.drawable.wall2_late_morning;
+            else if (hour >= 5)
+                return R.drawable.wall1_mid_morning;
+            else
+                return R.drawable.wall0_early_morning;
         }
 
         public Bitmap getBackground(Resources resources) {
@@ -151,15 +157,14 @@ public class LiveWallpaperService extends WallpaperService {
             int
                     currentWidth = metrics.widthPixels,
                     currentHeight = metrics.heightPixels,
-                    currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
-                    currentLevel = currentHour / 3;
+                    currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
 
-            if (lastLevel != currentLevel) {
-                int id = getBackgroundIdByLevel(currentLevel);
+            if (lastHour != currentHour) {
+                int id = getBackgroundForHour(currentHour);
                 lastBackground = BitmapFactory.decodeResource(resources, id);
             }
 
-            if (lastLevel != currentLevel
+            if (lastHour != currentHour
                     || lastWidth != currentWidth
                     || lastHeight != currentHeight) {
 
@@ -169,7 +174,7 @@ public class LiveWallpaperService extends WallpaperService {
                         currentHeight
                 );
 
-                lastLevel = currentLevel;
+                lastHour = currentHour;
                 lastWidth = currentWidth;
                 lastHeight = currentHeight;
             }
