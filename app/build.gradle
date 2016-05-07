@@ -8,6 +8,8 @@ android {
         applicationId "com.bewareofraj.wallpaper.bitdaylivewallpaper"
         minSdkVersion 7
         targetSdkVersion 23
+        versionCode 8
+        versionName "2.0"
     }
 
     buildTypes {
